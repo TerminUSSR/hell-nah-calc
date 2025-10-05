@@ -11,6 +11,7 @@ int main(){
     auto prec = [](char op) {
         if (op == '+' || op == '-') return 1;
         if (op == '*' || op == '/') return 2;
+        if (op == '^') return INT_MAX;
         if (op == '(') return INT_MIN;
         if (op == ')') return 0;
         throw exception("unknown operator");
@@ -38,6 +39,7 @@ int main(){
             case '-':
             case '*':
             case '/':
+            case '^':
                 pushOp(c);
                 stk.push(c);
                 lastOp = true;
@@ -49,6 +51,9 @@ int main(){
             case ')':
                 pushOp(c);
                 stk.pop();
+                break;
+            default:
+                throw exception("unknown operator");
             }
         }
     }
