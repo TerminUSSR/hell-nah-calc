@@ -7,6 +7,7 @@ int main(){
     string exit;
     stack<char> stk;
     char c;
+    int skCount = 0;
     bool lastOp = true;
     auto prec = [](char op) {
         if (op == '+' || op == '-') return 1;
@@ -14,25 +15,35 @@ int main(){
         if (op == '^') return INT_MAX;
         if (op == '(') return INT_MIN;
         if (op == ')') return 0;
-        throw exception("unknown operator");
         };
     auto pushOp = [&](char c = '(') {
         while (!stk.empty() && prec(stk.top()) >= prec(c)) {
+            if (stk.top() == '(') throw exception ("close your skobkas");
             exit.push_back(stk.top());
+            exit.push_back(' ');
             stk.pop();
         }
         };
     while (IN.peek() != '\n' && IN.peek() != '\0') {
-        IN >> c;
+        if (!lastOp && IN.peek() == '(') c = '*';
+        else IN >> c;
         if(isdigit(c)){
             exit.push_back(c);
+            if(!isdigit(IN.peek())) exit.push_back(' ');
             lastOp = false;
         }
         else if (lastOp && c != '-' && c != '(') {
                 cout << "Hell nah";
                 return -1;
         }
-        else if (lastOp && c == '-') exit.push_back('_');
+        else if (lastOp && c == '-') {
+            exit.push_back('_');
+            if (IN.peek() == '(') {
+                exit.push_back('1');
+                exit.push_back(' ');
+                lastOp = false;
+            }
+        }
         else {
             switch (c) {
             case '+':
@@ -47,10 +58,19 @@ int main(){
             case '(':
                 stk.push(c);
                 lastOp = true;
+                skCount++;
                 break;
             case ')':
+                if (skCount <= 0) {
+                    throw exception("open your skobkas");
+                }
                 pushOp(c);
                 stk.pop();
+                if (isdigit(IN.peek())) {
+                    pushOp('*');
+                    stk.push('*');
+                    lastOp = true;
+                }
                 break;
             default:
                 throw exception("unknown operator");
