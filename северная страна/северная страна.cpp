@@ -2,8 +2,7 @@
 #include <string>
 #include <stack>
 using namespace std;
-int main(){
-    istream& IN = cin;
+string RPN(istream& IN = cin) {
     string exit;
     stack<char> stk;
     char c;
@@ -18,7 +17,7 @@ int main(){
         };
     auto pushOp = [&](char c = '(') {
         while (!stk.empty() && prec(stk.top()) >= prec(c)) {
-            if (stk.top() == '(') throw exception ("close your skobkas");
+            if (stk.top() == '(') throw exception("close your skobkas");
             exit.push_back(stk.top());
             exit.push_back(' ');
             stk.pop();
@@ -27,16 +26,17 @@ int main(){
     while (IN.peek() != '\n' && IN.peek() != '\0') {
         if (!lastOp && IN.peek() == '(') c = '*';
         else IN >> c;
-        if(isdigit(c)){
+        if (isdigit(c) && lastOp) {
             exit.push_back(c);
-            if(!isdigit(IN.peek())) exit.push_back(' ');
-            lastOp = false;
+            if (!isdigit(IN.peek())) { 
+                exit.push_back(' ');
+                lastOp = false;
+            };
         }
         else if (lastOp && c != '-' && c != '(') {
-                cout << "Hell nah";
-                return -1;
+            throw exception("Hell nah");
         }
-        else if (lastOp && c == '-') {
+        else if (lastOp && c == '-') { 
             exit.push_back('_');
             if (IN.peek() == '(') {
                 exit.push_back('1');
@@ -77,6 +77,24 @@ int main(){
             }
         }
     }
+    if (lastOp) {
+        throw exception("lack of arguments");
+    }
     pushOp();
-    cout << exit;
+    return exit;
+}
+double calc(istream& IN){
+    stack<double> stk;
+    string c;
+    IN >> c;
+    try { stk.push(stod(c)); }
+    catch (out_of_range& oor) {
+        //вернуть дабл
+    }
+    catch (invalid_argument& ia) {
+        //s
+    }
+}
+int main(){
+    cout << RPN();
 }
