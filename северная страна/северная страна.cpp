@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <string>
+#include <sstream>
 #include <stack>
 using namespace std;
 string RPN(istream& IN = cin) {
@@ -81,20 +82,57 @@ string RPN(istream& IN = cin) {
         throw exception("lack of arguments");
     }
     pushOp();
+    exit.pop_back();
     return exit;
 }
 double calc(istream& IN){
     stack<double> stk;
+    auto Oper = [&](char g) {
+        double a = stk.top();
+        stk.pop();
+        double b = stk.top();
+        stk.pop();
+        switch (g) {
+        case '+':
+            stk.push(a + b);
+            break;
+        case '-':
+            stk.push(b - a);
+            break;
+        case '*':
+            stk.push(a * b);
+            break;
+        case '/':
+            if (a == 0) throw exception("dont divide by zero");
+            stk.push(b / a);
+            break;
+        case '^':
+            double c = 1;
+            for (int i = 0; i < a; i++) {
+                c *= b;
+            }
+            stk.push(c);
+        }
+        };
     string c;
-    IN >> c;
-    try { stk.push(stod(c)); }
-    catch (out_of_range& oor) {
-        //вернуть дабл
+    while (IN.peek() != '\n' && IN.peek() != '\0' && !IN.eof()) {
+        IN >> c;
+        if (c[0] == '_') c[0] = '-';
+        try { stk.push(stod(c)); }
+        catch (invalid_argument& ia) {
+            Oper(c[0]);
+        }
     }
-    catch (invalid_argument& ia) {
-        //s
-    }
+    if (stk.size() > 1) throw exception("hell nah");
+    return stk.top();
 }
-int main(){
-    cout << RPN();
+double calc(const string& c) {
+    istringstream ashot(c);
+    return calc(ashot);
+}
+int main() {
+    try { cout << calc(RPN()); }
+    catch (exception& ex) {
+        cout << ex.what();
+    }
 }
