@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <stack>
+#include <cmath>
 using namespace std;
 string RPN(istream& IN = cin) {
     string exit;
@@ -107,10 +108,10 @@ double calc(istream& IN){
             stk.push(b / a);
             break;
         case '^':
-            double c = 1;
-            for (int i = 0; i < a; i++) {
-                c *= b;
-            }
+            double c = pow(b, a)/*1*/;
+            //for (int i = 0; i < a; i++) {
+            //    c *= b;
+            //}
             stk.push(c);
         }
         };
